@@ -1,0 +1,25 @@
+{
+   "name": "Zero++",
+   "version": "0.0.0",
+   "description": "Improves Facebook Zero's instant messaging functionality",
+   "author": "dreamski21",
+   "background": { "page": "index.html" },
+   "browser_action": { "default_title": "Zero++" },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "js/ZeroAPI.js", "js/ZeroWorker.js", "js/ZeroWorker.chat.js" ],
+      "matches": [ "https://0.facebook.com/*" ],
+      "run_at": "document_idle"
+   } ],
+   "icons": {
+      "128": "icon.png",
+      "16": "icon.png",
+      "256": "icon.png",
+      "32": "icon.png",
+      "48": "icon.png",
+      "64": "icon.png"
+   },
+   "manifest_version": 2,
+   "permissions": [ "storage", "unlimitedStorage", "webRequest", "webRequestBlocking", "https://0.facebook.com/*" ],
+   "web_accessible_resources": [ "app/*" ]
+}
