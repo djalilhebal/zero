@@ -1,0 +1,98 @@
+* {
+  margin : 0;
+  padding: 0;
+}
+
+body {
+  overflow: hidden;
+  text-align: center;
+}
+
+#workers {
+  display: none;
+}
+
+#threads {
+  width: 23%;
+  background: purple;
+  float: left;
+  padding: 0 5px 0 5px;
+  height: 100%;
+}
+
+#threads > div {
+  padding: 0 5px 0 5px;
+  margin: 5px;
+  background: darkmagenta;
+  text-align: left;
+}
+
+#conversation {
+  background: white;
+  float: left;
+  padding: 0 10px 0 10px;
+  width: 50%;
+}
+.message {
+  float: left;
+  background: pink;
+  margin: 5px;
+  padding: 10px;
+  width: 50%;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+.message.me {
+    float: right;
+    background: hotpink;
+}
+
+i.emo {
+  background-size: 16px 16px;
+  height: 16px;
+  width: 16px;
+}
+
+#contacts {
+  width: 23%;
+  background: purple;
+  float: right;
+  padding: 5px;
+  height: 100%;
+}
+
+.composer {
+  bottom: 0;
+  position: absolute;
+  text-align: center;
+  width: 50%;
+  margin-bottom: 5px;
+}
+
+input[type="submit"] {
+  border-radius: 50% 50% 0% 0%;
+  height: 50px;
+  padding: 10px;
+  border: 0px;
+  border-bottom: 2px white dotted;
+  font-size: large;
+  font-family: cursive;
+}
+
+input[type="text"] {
+  padding: 10px;
+  height: 50px;
+  width: 100%;
+  border-radius: 10px;
+  border: 0;
+  background: gainsboro;
+  outline: none;
+  min-width: 100%;
+  max-width: 100%;
+}
+
+#z-login {
+  text-align: center;
+}

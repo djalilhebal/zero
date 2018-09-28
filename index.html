@@ -1,14 +1,68 @@
 <html>
   <head>
     <title>Zero++</title>
+    <link href="app/index.css" rel='stylesheet' type='text/css' />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  </head>
   <body>
-    <div id="workers"></div>
+    <div id="app">
+      <z-login></z-login>
+
+      <div v-if="myId" id="user-interface">
+        <div id="threads">
+        <h2>Threads</h2>
+
+        <z-thread
+            v-for="conversation in conversations"
+            v-bind:obj="conversation"
+            :key="conversation.id">
+        </z-thread>
+        </div>
+        
+        <div id="conversation">
+          <h2>Conversation</h2>
+          <conversation
+            v-for="conversation in conversations"
+            v-if="conversation.id === activeConversation"
+            v-bind:obj="conversation"
+            :key="conversation.id"
+            >
+          </conversation>
+        </div>
+        
+        <div id="contacts">
+          <h2>Contacts</h2>
+          <z-contact
+            v-for="profile in profiles"
+            v-bind:obj="profile"
+            :key="profile.id"
+            >
+          </z-contact>
+        </div>
+      </div>
+  </div>
+
+    <!-- API -->
+    <div id="workers"></div>    
+    <!-- Classes -->
+    <script src="src/Worker.js"></script>
+    <script src="src/Profile.js"></script>
+    <script src="src/Moi.js"></script>
+    <script src="src/Thread.js"></script>
+    <script src="src/Conversation.js"></script>
+    <script src="src/Message.js"></script>
     
-    <script src="js/ZeroAPI.js"></script>
-    <script src="js/Chat.js"></script>
-    <script src="js/Profile.js"></script>
-    <script src="js/ZeroDatabase.js"></script>
-    <script src="js/background.js"></script>
+    <script src="src/background.js"></script>
+    
+    <!-- App -->
+    <script src="app/vue.js"></script>
+    <!-- My 'zero' components -->
+    <script src="app/z/z-login.js"></script>
+    <script src="app/z/z-message.js"></script>
+    <script src="app/z/z-thread.js"></script>
+    <script src="app/z/z-conversation.js"></script>
+    <!-- Main -->    
+    <script src="app/index.js"></script>
     
   </body>
 </html>

@@ -1,0 +1,30 @@
+ZeroContact[]
+-------------
+{name, threadLink, isActive}
+
+
+ZeroProfile
+-----------
+name, messageLink, isPage, myId, myLogoutLink, // required
+username, isActive, gender, altName, mobile, // additional
+
+
+ZeroMessage
+-----------
+text, senderLink, deleteLink, senderName, footer
+
+
+ZeroConversation
+----------------
+name, messages, canReply, linkToOlder, linkToNewer, isActive, activeText,
+isGroup, linkToParticipants
+
+
+ZeroThread
+----------
+link, name, snippet, footer, isActive, isUnread, unreadCount
+
+
+ZeroThreads
+-----------
+threads, linkToOlder, linkToNewer
