@@ -1,0 +1,47 @@
+ZeroProfile
+  name, messageLink, isPage, myId, myLogoutLink, // required
+  username, isActive, gender, altName, mobile, // additional
+
+  postprocessed: -messageLink, +id, +isMoi
+
+=========
+
+Buddylist
+  contacts: <{name, threadLink, hasGreenDot}>
+
+=========
+
+ThreadsChunk
+  threads: <ZeroThread>
+  olderLink: string
+  newerLink: string
+
+ZeroThread
+  name: string
+  link: string
+  snippet: string
+  footer: string
+  hasGreenDot: string
+  isUnread: string
+  unreadCount: string
+
+=========
+
+ChatChunk
+  name: string
+  messages: <ZeroMessage>
+  hasGreenDot: boolean
+  activeText: string
+  hasComposer: boolean
+  link: string // _pageLink
+  olderLink: string
+  newerLink: string
+  deleteLink: string
+  groupInfoLink: string
+
+ZeroMessage
+  text: string
+  senderName: string
+  senderLink: string
+  deleteLink: string
+  footer: string

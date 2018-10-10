@@ -1,21 +1,13 @@
 /** @file ZeroWorker.profile */
 
-/** @returns {boolean} Are we in a profile's info page? */
-ZeroWorker.inProfileInfo = function inProfileInfo() {
-  const path = ZeroWorker._pagePath
-  const params = ZeroWorker._pageUrl.searchParams
-  return /^\/profile\.php/.test(path) &&
-    params.has('id') && params.get('v') === 'info';
-}
-
 /** @returns {object} Profile's info */
 ZeroWorker.getProfileInfo = function getProfileInfo() {
-  
+
   /** @returns {boolean} Is it not a user's page? */
   function isPageProfile() {
     return !!document.querySelector('#pages_follow_action_id')
   }
-  
+
   /**
    * Gets user profile info attributes.
    *
@@ -39,10 +31,15 @@ ZeroWorker.getProfileInfo = function getProfileInfo() {
   function getUsername() {
     return getAttr('Facebook').slice(1)
   }
-  
+
   /** @returns {string} link to start conversation with this profile */
   function getMessageLink() {
     return ZeroWorker.getLink('https://0.facebook.com/messages/thread/')
+  }
+
+  /** @returns {string} My link to log out */
+  function getMyLogoutLink() {
+    return ZeroWorker.getLink('https://0.facebook.com/logout.php')
   }
 
   /** @returns {string} A numerical string represents the current user's id */
@@ -55,14 +52,9 @@ ZeroWorker.getProfileInfo = function getProfileInfo() {
       const [, myId] = link.match(rMyId)
       return myId
     } catch (e) {
-      console.warn(e)
+      // console.warn(e)
       return ''
     }
-  }
-  
-  /** @returns {string} My link to log out */
-  function getMyLogoutLink() {
-    return ZeroWorker.getLink('https://0.facebook.com/logout.php')
   }
 
   /** @returns {string} alternative name */
@@ -101,9 +93,9 @@ ZeroWorker.getProfileInfo = function getProfileInfo() {
     return {
       name, messageLink, isPage, myId, myLogoutLink, // required
       username, isActive, gender, altName, mobile, // additional
-      }
+    }
   } catch(e) {
     console.error(e)
-    return {}
+    return {error: e}
   }
 }

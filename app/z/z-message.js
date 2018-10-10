@@ -1,14 +1,17 @@
-Vue.component('message', {
+Vue.component('z-message', {
   props: ['obj'],
   template: `
-  <div class="message" :class="{me: isMine()}">
-    <b>{{obj.senderName}}</b><br>{{ obj.text }}
+  <div class="message" :class="{isMine}" v-if="!obj.hidden" >
+    <div class="sender" title="">{{obj.senderName}}</div>
+    <div v-if="obj.text" class="content" v-html="obj.text"></div>
+    <div v-if="obj.data" class="content"><img v-bind:src="obj.data" /></div>
   </div>`,
-  methods: {
+  computed: {
     isMine() {
-      const me = this.$root.profiles[this.$root.myId]
+      const moi = this.$root.moi
       const sender = this.obj.sender
-      return sender === me.id || sender === '@' + me.username
+      return sender === moi.id || sender === moi.username
     }
-  }
+  },
+  methods: {}
 })

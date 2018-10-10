@@ -1,37 +1,43 @@
 <html>
   <head>
-    <title>Zero++</title>
-    <link href="app/index.css" rel='stylesheet' type='text/css' />
+    <title>ZeroMessenger</title>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link href="app/styles/index.css" rel='stylesheet' type='text/css' />
+    <link href="app/styles/threads.css" rel='stylesheet' type='text/css' />
+    <link href="app/styles/contacts.css" rel='stylesheet' type='text/css' />
+    <link href="app/styles/conversation.css" rel='stylesheet' type='text/css' />
   </head>
   <body>
     <div id="app">
+
+    <div v-if="!moi">
       <z-login></z-login>
-
-      <div v-if="myId" id="user-interface">
+    </div>
+    <div v-else id="user-interface">
+      <div id="left">
+        <h2><< Threads >></h2>
         <div id="threads">
-        <h2>Threads</h2>
-
-        <z-thread
-            v-for="conversation in conversations"
-            v-bind:obj="conversation"
-            :key="conversation.id">
-        </z-thread>
-        </div>
-        
-        <div id="conversation">
-          <h2>Conversation</h2>
-          <conversation
-            v-for="conversation in conversations"
-            v-if="conversation.id === activeConversation"
-            v-bind:obj="conversation"
-            :key="conversation.id"
+          <z-thread
+            v-for="thread in threads"
+            v-bind:obj="thread"
+            v-bind:key="thread.id"
             >
-          </conversation>
+          </z-thread>
         </div>
-        
+      </div>
+
+      <div id="center">
+        <h2><< Conversation >></h2>
+        <z-conversation
+          v-bind:conv="conversations[conversations.active]"
+          ></z-conversation>
+      </div>
+
+      <div id="right">
+        <z-moi v-bind:moi="moi"></z-moi>
+        <h2><< Contacts >></h2>
         <div id="contacts">
-          <h2>Contacts</h2>
           <z-contact
             v-for="profile in profiles"
             v-bind:obj="profile"
@@ -40,29 +46,32 @@
           </z-contact>
         </div>
       </div>
+    </div>
   </div>
 
     <!-- API -->
-    <div id="workers"></div>    
+    <div id="workplace"></div>
     <!-- Classes -->
-    <script src="src/Worker.js"></script>
+    <script src="src/Master.js"></script>
     <script src="src/Profile.js"></script>
     <script src="src/Moi.js"></script>
-    <script src="src/Thread.js"></script>
-    <script src="src/Conversation.js"></script>
     <script src="src/Message.js"></script>
-    
+    <script src="src/TextMessage.js"></script>
+    <script src="src/MediaMessage.js"></script>
+    <script src="src/Conversation.js"></script>
+
     <script src="src/background.js"></script>
-    
+
     <!-- App -->
     <script src="app/vue.js"></script>
     <!-- My 'zero' components -->
     <script src="app/z/z-login.js"></script>
-    <script src="app/z/z-message.js"></script>
+    <script src="app/z/z-contact.js"></script>
     <script src="app/z/z-thread.js"></script>
+    <script src="app/z/z-message.js"></script>
     <script src="app/z/z-conversation.js"></script>
-    <!-- Main -->    
+    <!-- Main -->
     <script src="app/index.js"></script>
-    
+
   </body>
 </html>

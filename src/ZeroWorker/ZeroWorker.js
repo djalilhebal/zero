@@ -21,7 +21,7 @@ ZeroWorker.addMeta = function addMeta(obj) {
 }
 
 /**
- * A general purpose link getter
+ * A general purpose link finder
  * @param {string} str
  * @returns {string}
  */
@@ -31,13 +31,13 @@ ZeroWorker.getLink = function getLink(str) {
     const link = $links.find(a => a.href.indexOf(str) === 0).href
     return link
   } catch (e) {
-    console.error(e)
+    console.warn(e)
     return ''
   }
 }
 
 /**
- * A general purpose CSS class names getter
+ * A general purpose CSS class names finder
  * Class name changes randomly, we use this to determine them
  * @example
  * // having a rule .xx{font-weight:bold;}
@@ -54,6 +54,33 @@ ZeroWorker.getClassName = function getClassName(rule) {
   return xx || '';
 }
 
+/**
+ * Handles emojis and emotions, for threads and messages
+ * @todo handle urls
+ * @todo use prefixes: emoji, emoticon, url, etc
+ * @param {HTMLElement} $div
+ */
+ZeroWorker.textify = function textify($div) {
+  const SPECIAL_START = '\001'
+  const SPECIAL_STOP = '\002'
+  const mark = (str) => SPECIAL_START + str + SPECIAL_STOP
+  
+  $div.querySelectorAll('i[style]').forEach( ($emoImage) => {
+    const imgUrl = $emoImage.style.backgroundImage;
+    const url = imgUrl.slice(5, -2)
+    const text = mark('emoticon:' + url)
+    $emoImage.replaceWith(text)
+  })
+
+  const emoClass = ZeroWorker.getClassName('{display:table-cell;padding:4px;')
+  $div.querySelectorAll(`[class="${emoClass}"]`).forEach( ($emoText) => {
+    const text = mark('emoji:' + $emoText.innerText.trim())
+    $emoText.parentElement.replaceWith(text)
+  })
+
+}
+
+
 /** @return {string} Error text or an empty string */
 ZeroWorker.getError = function getError() {
   const errBorderColor = "rgb(221, 60, 16)" // red
@@ -69,11 +96,12 @@ ZeroWorker.getError = function getError() {
 }
 
 /**
- * Obeys Master/Worker's orders.
+ * Obeys Master's orders.
  *
  * @param {Event} event
  * @param {object} event.data
  * @param {string} event.data.fn
+ * @param {Array} event.data.args
  * @listens Window:message
  * @fires Window:message
  */

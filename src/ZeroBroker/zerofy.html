@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Zerofy</title>
+    <style>
+    * { padding: 0; margin: 0; }
+    body { background: black; }
+
+    #top {
+      height: 300px;
+      padding: 7px;
+      background: #6b006b;
+      color: white;
+    }
+
+    #info {
+      white-space: pre-line;
+      font-size: large;
+    }
+
+    #info i {
+      font-size: smaller;
+    }
+
+    #input {
+      width: 250px;
+      float: left;
+      border-right: 3px solid white;
+      margin-right: 10px;
+      padding: 10px;
+    }
+
+    #input button {
+      float: left;
+      margin-right: 5px;
+    }
+
+    #input input[type="file"] {
+      width: 150px;
+      float: left;
+      display: inline-block;
+    }
+
+    #input img {
+      height: 250px;
+      max-width: 250px;
+      margin: 5px 0;
+      background: black;
+      display: block;
+      text-align: center; /* for the alt text */
+    }
+
+    #output {
+      text-align: center;
+      padding: 10px;
+      align-content: center;
+    }
+
+    #output textarea {
+      width: 90%;
+      margin: 2px;
+      padding: 2px;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="top">
+      <div id="input">
+        <img alt="Preview..." />
+        <button>Zerofy!</button>
+        <input type="file" accept="image/*" />
+      </div>
+      <div id="info"><h1>Zerofy~</h1>
+        <i>2018-10-08, #oneshot, #experiment (FileReader API)
+        #challenge (@Wanis, when I say 'Consider it done', you should consider it done :v)</i>
+        
+        To send a picture to a poor friend of yours (*Moi*) on Facebook Zero:
+        - Select a (small) picture.
+        - Click "Zerofy!"
+        - Copy each text/part and send it to your poor friend.
+        - Then your friend should take care of those parts (combine them and view the picture).
+        
+        NOTE: It works kinda fine (but sorta sluggish) on Google Chrome v69.
+      </div>
+    </div>
+    <div id="output">
+      <textarea>ZeroMedia 1366666 1-3 [[DAAATAAAAAAAAAAAAA]]</textarea>
+      <textarea>ZeroMedia 1366666 2-3 [[DAAAAAAATTTAAAAAAA]]</textarea>
+      <textarea>ZeroMedia 1366666 3-3 [[DAATTAAA]]</textarea>
+    </div>
+    <script>
+    const $input = document.querySelector('input[type="file"]');
+    const $image = document.querySelector('img');
+    const $button = document.querySelector('button');
+    const $output = document.querySelector('#output');
+
+    $input.onchange = function onChange() {
+      const file = $input.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => $image.src = reader.result;
+        reader.readAsDataURL(file);    
+      }
+
+    }
+
+    $button.onclick = function zerofyFile() {
+      const MAX_MESSAGE = 2 ** 14;  // 16KB - limited by Facebook or idk
+      const MAX_PART_DATA = MAX_MESSAGE;
+
+      // id = Date now (13 symbols) + random int (10 symbols)
+      const id = Date.now() + '' + (Math.random() * 10 ** 10).toFixed();
+      const fullData = $image.src;
+      const partsCount = Math.ceil(fullData.length / MAX_PART_DATA);
+      const parts =
+        new Array(partsCount)
+        .fill('')
+        .map( (_, i) => {
+          const partNum = i + 1;
+          const start = i * MAX_PART_DATA;
+          const stop = (i + 1) * MAX_PART_DATA;
+          const partData = fullData.slice(start, stop);
+          const part = `ZeroMedia ${id} ${partNum}-${partsCount} ${partData}`;
+          return part
+        })
+        .map( part => `<textarea>${part}</textarea>` )
+        .join('\n');
+        
+      $output.innerHTML = parts;
+    }
+    </script>
+  </body>
+</html>

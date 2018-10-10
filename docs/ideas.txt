@@ -1,0 +1,19 @@
+rename: _iframe > _worker
+Security: think 'bout XSS (in that specialText thing + display as HTML)
+
+
+- Use chatchunks' first/last timestamp to set messages' dates
+
+parse empty messages -> "0"
+
+
+ZeroBroker.request(id)
+
+Conversation.chunks // keep them
+
+threads.lastChecked, loading, empty
+Conversation.index = pageNum * 10 + index
+
+Contact.updateContact
+
+status: unknown

@@ -2,8 +2,8 @@ class Profile {
   /**
    * Create new profile.
    * @example
-   * const a = new Profile({id: '123', name: 'Wanis Rowdy', username: '@wanis.rowdy'})
-   * const b = new Profile({id: '42', name: 'الباحثون المسلمون', username: '@muslim.researchers'})
+   * const a = new Profile({id: '...', name: 'Wanis Rowdy', username: '@wanis.rowdy'})
+   * const b = new Profile({id: '...', name: 'الباحثون المسلمون', username: '@muslim.researchers'})
    *
    * @param {Object} obj
    * @param {string} obj.id
@@ -13,33 +13,44 @@ class Profile {
   constructor(obj) {
     this.id = obj.id
     this.name = obj.name
-    this.username = (obj.username || '').toLowerCase()
+    this.username = this.formatUsername(obj.username)
   }
-  
+
+  /** @returns {string} */
+  formatUsername(str) {
+    // TODO:  toLowerCase it?
+    if (!str)
+      return ''
+    else if (str.startsWith('@'))
+      return str
+    else
+    return '@' + str
+  }
+
   /** @param {Object} obj */
   static postprocessProfile(obj) {
     let {id} =  Conversation.parseLink(obj.messageLink)
     const username = obj.username || Conversation.parseLink(obj._pageLink).username || ''
-    const isMe = !!obj.myId
-    id =  isMe? obj.myId : id
+    const isMoi = !!obj.myId
+    id =  isMoi? obj.myId : id
 
     delete obj.myId
     obj.id = id
-    obj.isMe = isMe
+    obj.isMoi = isMoi
     obj.username = username
   }
-  
+
   /**
    * @param {?string} id
    * @returns {Object}
    */
   static async getUserInfo(id) {
     const job = {url: Profile.getLinkToProfile(id), fn: 'getProfileInfo'}
-    const res = await (new Worker(job)).getResponse()
+    const res = await (new Master(job)).getResponse()
     Profile.postprocessProfile(res)
     return res
   }
-  
+
   /**
    * @param {?string} id - user id or username or null
    * @param {boolean} [info=true] - Go to info page? (Only for users)
@@ -70,10 +81,10 @@ class User extends Profile {
     this.activeDate = obj.isActive? obj._pageDate : null
     this.lastChecked = obj._pageDate
   }
-  
+
   /**
    * Updates user's status (active or inactive)
-   * Input can come from `profile`, `buddylist`, `conversation`, `threads`
+   * Input can come from `profile`, `buddylist`, `conversation`, or `threads`
    *
    * @param {object} obj
    * @param {boolean} obj.isActive
@@ -94,6 +105,6 @@ class User extends Profile {
 
 class Page extends Profile {
   constructor(obj) {
-    super(obj);
+    super(obj)
   }
 }

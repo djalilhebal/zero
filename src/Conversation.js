@@ -5,64 +5,90 @@ class Conversation {
     }
 
     this.name = obj.name
-    this.id = moi.getTheirId(obj._pageLink) // official
+    this.id = obj.id || moi.getTheirId(obj._pageLink) // official
     this.participants = [] // official
-    this.snippet = obj.snippet || '' // official
+    this.snippet = TextMessage.formatText(obj.snippet) // official
     this.updatedTime = null // official
     this.messageCount = null // official
     this.unreadCount = null // official
     this.canReply = obj.canReply || null // official
+    this.footer = obj.footer || ''
 
     this.isGroup = obj.isGroup
     this.messages = obj.messages || []
     this.outbox = []
 
+    this.index = obj.index
     this._isUnread = obj.isUnread
     this._unreadCount = obj.unreadCount
 
-    const latestMessage = this.messages.slice(-1)[0]
-    this._latestMid = latestMessage && latestMessage.mids.slice(-1)[0]
+    const latestMessage = this.getLatestMessage()
+    this._latestMid = latestMessage && latestMessage.getLatestMid()
+    this._obj = obj
+  }
+
+  mediafy(x) {
+    const matched = x.text.match(MediaMessage.rZeroMedia)
+    if (matched) {
+      x.hidden = true
+      let [, id, partNum, partsCount, partData] = matched;
+      const old = this.messages.find( y => y instanceof MediaMessage && y.id === id)
+      if (old) {
+        old.addPart(partNum, partData)
+      } else {
+        const media = new MediaMessage(id, partsCount, x)
+        media.addPart(partNum, partData)
+        this.messages.push(media)
+      }
+    }
+  }
+
+  /** @returns {Message} */
+  getLatestMessage() {
+    return this.messages.filter(x => x instanceof Message).slice(-1)[0]
   }
 
   async init() {
+    if (this.messages.length)
+      return;
     const {messages} = await Conversation.getChunk(this.id)
-    this.messages = messages || []
-    const latestMessage = this.messages.slice(-1)[0]
-    this._latestMid = latestMessage && latestMessage.mids.slice(-1)[0]
+    this.messages = (messages || []).map( m => new TextMessage(m))
+    this.messages.forEach( message => this.mediafy(message))
+    const latestMessage = this.getLatestMessage()
+    this._latestMid = latestMessage && latestMessage.getLatestMid()
   }
-  
+
   /** @returns {boolean} */
   async isUpToDate() {
     if (!this._latestMid) {
       return false
     } else {
       const chunk = await Conversation.getChunk(this.id)
-      const latestMessageId = chunk.messages.slice(-1)[0].mids.slice(-1)[0]
+      const latestMessageId = chunk.messages.slice(-1)[0].getLatestMid()
       return latestMessageId === this._latestMid
     }
   }
-  
+
   async update() {
     const isUpToDate = await this.isUpToDate()
     if (!isUpToDate) {
       const newMessages = await Conversation.getMessagesUntill(this.id, this._latestMid)
-      this._latestMid = newMessages.slice(-1)[0].mids.slice(-1)[0]
+      this._latestMid = newMessages.slice(-1)[0].getLatestMid()
       this.messages = this.messages.concat(newMessages)
     }
   }
 
-  updateFrom(obj) {
-    if (obj) {
-      this.snippet = obj.snippet
-      this._unreadCount = obj._unreadCount
-      this._isUnread = obj._isUnread
+  updateFromThread(obj) {
+    if (typeof obj === 'object') {
+      this.snippet = TextMessage.formatText(obj.snippet)
+      this.footer = obj.footer
+      this.index = obj.index
+      this._isUnread = obj.isUnread
+      this._unreadCount = obj.unreadCount
     }
   }
-  
-  /**
-   * @returns {number}
-   * @public
-   */
+
+  /** @returns {number} */
   getUnreadCount() {
     if (this._unreadCount)
       return Number(this._unreadCount)
@@ -71,20 +97,38 @@ class Conversation {
     else
       return 0
   }
-  
+
   /**
-   * Sends a text message.
-   *
-   * @param {string} id - Conversation id
-   * @param {string} text
+   * @todo Optimize it a little!! >_<
    */
-  static async sendText(id, text) {
-    const url = Conversation.getLinkToChat(id)
-    const job = {url, fn: 'sendText', args: [text], reloads: true}
-    const res = await (new Worker(job)).getResponse()
-    return res
+  deduplicate() {
+    this.messages.forEach( (messageA, i) => {
+      this.messages.forEach( (messageB, j) => {
+        if (i !== j && messageA.isContainedIn(messageB)) {
+          this.copyAndDelete(i, j)
+        }
+      })
+    })
   }
   
+  /**
+   * Can `this` be considered a subset of `x`?
+   * @param {Message} x
+   * @returns {boolean}
+   */
+  isContainedIn(x) {
+    return this.mids.every(mid => x.mids.includes(mid) );
+  }
+
+  // Copy any useful information from index `i` to index `j`, then delete `i`
+  copyAndDelete(i, j) {
+    // For now, the only information we are interested in, is `createdTime`
+    if (this.messages[i].createdTime) {
+      this.messages[j].createdTime = this.messages[i].createdTime;
+    }
+    this.messages.splice(i, 1);
+  }
+
   /**
    * @param {string} id - conversation id or link
    * @returns {Object}
@@ -92,11 +136,11 @@ class Conversation {
   static async getChunk(id) {
     const url = id.startsWith('http') ? id : Conversation.getLinkToChat(id)
     const job = {url, fn: 'getChunk'}
-    const res = await (new Worker(job)).getResponse()
-    Message.postprocessChunk(res)
+    const res = await (new Master(job)).getResponse()
+    //Message.postprocessChunk(res)
     return res
   }
-  
+
   /**
    * @param {string} id - Conversation id
    * @param {string} mid - Message id
@@ -119,7 +163,7 @@ class Conversation {
     const messages = Message.mergeChunksAfter(chunks, mid)
     return messages
   }
-  
+
   /**
    * @param {string} id
    * @return {string}
@@ -127,22 +171,22 @@ class Conversation {
   static getLinkToChat(id) {
     return `${Zero.origin}/messages/read?fbid=${id}&show_delete_message_button=1`
   }
-  
+
   /**
    * @param {string[]} ids - user ids
    * @returns {string}
    */
-  static getLinkToNewGroup(ids = []) {
+  static getNewGroupLink(ids = []) {
     const params = ids.map( (id, i) => `ids[${i}]=${id}` ).join('&')
     const url = `${Zero.origin}/messages/compose/?${params}`
     return url
   }
-  
+
   /**
    * @param {string} id
    * @returns {string}
    */
-  static getLinkToGroupInfo(id) {
+  static getGroupInfoLink(id) {
     return `${Zero.origin}/messages/participants/?tid=cid.g.${id}`
   }
 
@@ -150,14 +194,17 @@ class Conversation {
    * @param {?string} folder - inbox, pending, other, spam
    * @returns {string}
    */
-  static getLinkToThreads(folder = 'inbox') {
+  static getThreadsLink(folder = 'inbox') {
       return `${Zero.origin}/messages?folder=${folder}`
   }
-  
+
   /** @returns {Object} */
   static async getThreads() {
-    const job = {fn: 'getThreads', url: Thread.getLinkToThreads()}
-    const res = await (new Worker(job)).getResponse()
+    const job = {fn: 'getThreads', url: Conversation.getThreadsLink()}
+    const res = await (new Master(job)).getResponse()
+    res.threads.forEach( (thread) => {
+      thread.id = moi.getTheirId(thread.link)
+    })
     return res
   }
 
@@ -165,6 +212,7 @@ class Conversation {
    * Handles links of the forms:
    * - https://0.facebook.com/messages/read/?fbid=ID
    * - https://0.facebook.com/messages/read/?tid=cid.c.ID:MYID
+   * - https://0.facebook.com/messages/read/?tid=cid.c.MYID
    * - https://0.facebook.com/messages/read/?tid=cid.g.ID
    * - https://0.facebook.com/messages/thread/ID
    * - https://0.facebook.com/USER.NAME
@@ -173,15 +221,16 @@ class Conversation {
    * @returns {object} parsed link
    */
   static parseLink(link) {
+    if (!link) return {}
     // "https://0.facebook.com/messages/read/?fbid=ID" > "messages/read/?fbid=ID"
     link = link.slice(Zero.origin.length+1)
 
     const rFbid = /fbid=(\d+)/
-    const rTidc = /tid=cid\.c\.(\d+)%3A(\d+)/
+    const rTidc = /tid=cid\.c\.(\d+)(%3A((\d+)))?/
     const rTidg = /tid=cid\.g\.(\d+)/
-    const rThread = /^messages\/thread\/(\d+)/  
-    
-    const [, id, id2] = link.match(rFbid)  ||
+    const rThread = /^messages\/thread\/(\d+)/
+
+    const [, id, , id2] = link.match(rFbid)  ||
                    link.match(rTidc)  ||
                    link.match(rTidg)  ||
                    link.match(rThread)||
@@ -191,7 +240,7 @@ class Conversation {
     const [, firstTimestamp] = link.match(/first_message_timestamp=(\d+)/) || []
     const [, lastTimestamp] = link.match(/last_message_timestamp=(\d+)/) || []
     const [, username] = id ? [] : link.match(/^([\w\d\.]+)/) || []
-    
+
     return { id, id2, username, firstTimestamp, lastTimestamp, isGroup }
   }
 

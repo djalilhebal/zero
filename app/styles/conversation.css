@@ -1,0 +1,76 @@
+#center {
+  float: left;
+  width: 50%;
+  background: white;
+}
+
+.messages {
+  padding: 10px;
+  height: 85%;
+  overflow-y: scroll;
+  width: inherit;
+}
+
+.message {
+  background: darkgray;
+  width: 45%;
+  margin: 5px 0px;
+  padding: 7px;
+  border-radius: 10px;
+}
+
+.message.isMine {
+  margin-left: 50%;
+  background: blueviolet;
+  color: white;
+}
+
+.message .sender {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.message .content {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.message img {
+    width: 100%;
+}
+
+.message i.emo {
+  background-size: 16px 16px;
+  height: 16px;
+  width: 16px;
+  display: inline-block;
+}
+
+.composer {
+  height: 45px;
+  width: 50%;
+  border-top: 2px solid darkmagenta;
+  padding: 5px 2px;
+  bottom: 0px;
+  position: absolute;
+  margin-left: -15px;
+}
+
+.composer textarea {
+  width: 90%;
+  height: 40px;
+  float: left;
+  padding: 3px;
+}
+
+.composer button {
+  border-radius: 0% 50% 50% 0%;
+  background-color: darkmagenta;
+  padding: 12px;
+  color: white;
+  float: left;
+  border: 0;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: larger;
+}

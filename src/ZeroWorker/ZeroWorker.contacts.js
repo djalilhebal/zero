@@ -4,10 +4,10 @@
  * Parses https://0.facebook.com/buddylist.php
  * @returns {Array<Object>}
  */
-ZeroWorker.getContacts = function getContacts() {
+ZeroWorker.getBuddylist = function getBuddylist() {
   try {
     const $tables = document.querySelectorAll('#root div div div table')
-    
+
     return Array
       .from($tables)
       .map( ($table) => {
@@ -15,15 +15,25 @@ ZeroWorker.getContacts = function getContacts() {
         const name = $name.innerText
         const threadLink = $name.querySelector('a').href
         const isActive = $active.innerText === '●'
-        
+
         return {name, threadLink, isActive}
       })
-    
+
   } catch (e) {
     console.error(e)
     return []
   }
 }
+
+/**
+ * @param {string} str - search query
+ * @param {string} [type="people"] - people, pages
+ * @returns {string}
+ */
+function getSearchLink(str, type = 'people') {
+  return `${Zero.origin}/search/${type}/?q=${str}`
+}
+// {moreLink, Array<{name, link}>}
 
 ZeroWorker.getGroupInfo = function getGroupInfo() {
   /// @todo

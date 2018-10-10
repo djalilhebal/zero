@@ -12,16 +12,19 @@ ZeroWorker.getThreads = function getThreads() {
       throw new Error('Thread tables not found')
     }
     
-    const result = threadsTables.map( ($table) => {
+    const result = threadsTables.map( ($table, i) => {
       try {
+        // title, content, footer elements
         const $h3Elements = $table.querySelectorAll('h3')
         if ($h3Elements.length !== 3) {
           throw new Error('Expected 3 <h3> elements')
         }
-        return parseThread(...$h3Elements) // title, content, footer elements
+        const thread = parseThread(...$h3Elements)
+        thread.index = i
+        return thread
       } catch (e) {
         console.error(e)
-        return {}
+        return {error: e}
       }
       
     });
@@ -39,7 +42,8 @@ ZeroWorker.getThreads = function getThreads() {
     const rawName = titleEl.querySelector('a').innerText;
     const link = titleEl.querySelector('a').href;
 
-    const {name, unreadCount} = parseThreadTitle(rawName)
+    const {name, unreadCount} = parseThreadTitle(rawName);
+    ZeroWorker.textify(contentEl)
     const snippet = contentEl.innerText;
     const footer = footerEl.innerText;
     const isUnread = hasBoldClass(titleEl.classList);
