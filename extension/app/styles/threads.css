@@ -1,0 +1,49 @@
+#left {
+  float: left;
+  width: 25%;
+  background: gainsboro;
+}
+
+h2 {
+    text-align: center;
+    padding: 5px;
+    font-size: x-large;
+    font-family: monospace;
+}
+
+#threads {
+    height: 95%;
+    overflow-y: auto;
+}
+
+.thread {
+    padding: 5px;
+    margin: 5px 10px;
+    background: violet;
+    cursor: pointer;
+    transition: margin 0.1s linear;
+}
+
+.thread.unread {
+  border-left: 5px indigo solid;
+}
+
+.thread.active {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.thread .name {
+    font-weight: bold;
+}
+
+.thread .snippet {
+    border-top: 1px white dashed;
+    border-bottom: 1px white dashed;
+    padding: 5px;
+    margin: 5px;
+}
+
+.thread .footer {
+    font-style: italic;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "zerobroker",
+  "version": "0.0.0",
+  "description": "ZeroBroker for ZeroMessenger",
+  "main": "index.js",
+  "dependencies": {
+    "facebook-chat-api": "^1.4.0"
+  }
+}

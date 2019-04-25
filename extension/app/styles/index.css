@@ -1,0 +1,49 @@
+* {
+  margin : 0;
+  padding: 0;
+}
+
+body {
+  overflow: hidden;
+}
+
+#z-login {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+#z-login img {
+  height: 500px;
+  width: 280px;
+}
+
+#z-login .loading {
+  color: darkmagenta;
+  font-family: cursive;
+  font-size: 69px;
+  font-weight: bold;
+}
+
+#z-login .error {
+  color: red;
+  font-size: 25px;
+  font-weight: normal;
+  display: inline;
+}
+
+#z-login button {
+  background: red;
+  color: white;
+  font-size: 30px;
+  border-radius: 10px;
+  padding: 5px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+#workplace {
+  display: none;
+}

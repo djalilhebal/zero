@@ -1,19 +1,47 @@
-rename: _iframe > _worker
-Security: think 'bout XSS (in that specialText thing + display as HTML)
+Important
+=========
+- MediaMessage and TextMessage no longer exist: Everything is Message and ZeroFile, update refs!
+- Make use of ZeroWorker.d.ts
+- Keep usernames in the form /user and not @user.
+- ZeroWorker.getProfileInfo() should just return `myActivityLink` and not extract `myId` from it. Let ZeroMessenger do that. 
+- Use chatchunks' first/last timestamps to set messages' dates `createdDate`
+- Handle events ("Kaito left the group")
 
+- When sending messages, use **message composer** (as opposite to using a "normal" chat page); this way, old messages (which may be very long) won't be loaded.
+- Set the Moi's active status to 'unknown', before actually getting their correct status.
 
-- Use chatchunks' first/last timestamp to set messages' dates
+ZeroBroker
+==========
+- Add ZeroBroker.request(fbid) and Messenger.sendFile(file)
+- ZeroFile ids should start with a prefix like `zmid<NUMBER>`
+- Files should not be auto-requested. Only request them if the user clicks on them.
+- Verify the existence of ZeroBroker
+- No ZeroBroker but want to send ZeroMedia? "Do this if the recipient uses ZeroMessenger."
+- ZeroBroker deletes *parts* once it receives them.
+- ZeroMessenger deletes *parts* once it reads them.
 
-parse empty messages -> "0"
+zeroFile = ZeroBroker.makeZeroFile(file)
+zeroFile.parts, for each await sendText(toMySelf, autoretry)
 
+ZeroMessenger
+=============
+- Cache files? Something like: `Messenger.files = {}`
 
-ZeroBroker.request(id)
+- Separate background and app
+- message.isMine()? Hide senderName from the message bubble!
+- Chat.canReply = Chat.isGroup ? hasComposer : (senderLink || nameAppearsInComposer)
+- Message.status: fetched, sent, sending, failed
+- Message .isMine(), sent(), resend()
+- Add Right-To-Left support to Composer/Message.
+- Add these attrs: Conversation._oldChunks, Conversation._isUpdating, _isLoading
 
-Conversation.chunks // keep them
+threads.lastChecked, loading, isEmpty
+thread.index = pageNum * 10 + index in page
 
-threads.lastChecked, loading, empty
-Conversation.index = pageNum * 10 + index
-
-Contact.updateContact
-
-status: unknown
+TODO (Later)
+============
+- Write ZeroCommon.js: stuff used by Messenger, Worker, and Broker.
+- Serialize `composer` form and use axios to send messages. Use the FormData class instead of working with 'HTML <form> elements'.
+- **Security**: Have I exposed myself to XSS attacks? (In the 'specialText' thing + converting it to HTML)
+- Handle empty messages (that actually contain "0")?
+- ZeroProfile: photoId or photoLink, so we can `ZeroBroker.request(photoId)`
