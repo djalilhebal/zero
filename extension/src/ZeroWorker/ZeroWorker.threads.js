@@ -1,10 +1,12 @@
-/** @file ZeroWorker.threads */
-
+/**
+ * Parse chat threads in `/messages/`
+ * @returns {ThreadsChunk}
+ */
 ZeroWorker.getThreads = function getThreads() {
 
   // IFF there are unread messages, there will be this CSS rule:
   const boldClass = ZeroWorker.getClassName('{font-weight:bold;}')
-  const hasBoldClass = (list) => !!boldClass && list.contains(boldClass);
+  const hasBoldClass = (list) => !!boldClass && list.contains(boldClass)
 
   function parseThreads() {
     const threadsTables = Array.from(document.querySelectorAll('table.br'))
@@ -12,44 +14,43 @@ ZeroWorker.getThreads = function getThreads() {
       throw new Error('Thread tables not found')
     }
     
-    const result = threadsTables.map( ($table, i) => {
+    const threads = threadsTables.map( ($table, i) => {
+
       try {
-        // title, content, footer elements
-        const $h3Elements = $table.querySelectorAll('h3')
-        if ($h3Elements.length !== 3) {
-          throw new Error('Expected 3 <h3> elements')
-        }
-        const thread = parseThread(...$h3Elements)
-        thread.index = i
-        return thread
+        return parseThread(i, $table)
       } catch (e) {
         console.error(e)
-        return {error: e}
+        return undefined
       }
       
-    });
+    }).filter(thread => !!thread)
     
-    return result;
+    return threads
   }
   
   /**
-   * @param {HTMLElement} titleEl
-   * @param {HTMLElement} contentEl
-   * @param {HTMLElement} footerEl
-   * @returns {Object}
+   * @param {number} index - Index in the current page (as in, it's relative)
+   * @param {Element} $table
+   * @returns {ZeroThread}
    */
-  function parseThread(titleEl, contentEl, footerEl) {
-    const rawName = titleEl.querySelector('a').innerText;
-    const link = titleEl.querySelector('a').href;
+  function parseThread(index, $table) {
+    // $title, $content, and $footer elements
+    const $h3s = $table.querySelectorAll('h3')
+    if ($h3s.length !== 3) {
+      throw new Error('Expected 3 <h3> elements')
+    }
+    const [$title, $content, $footer] = Array.from($h3s) // TS complains about `...$h3s`
+    const rawName = $title.querySelector('a').innerText
+    const link = $title.querySelector('a').href
 
-    const {name, unreadCount} = parseThreadTitle(rawName);
-    ZeroWorker.textify(contentEl)
-    const snippet = contentEl.innerText;
-    const footer = footerEl.innerText;
-    const isUnread = hasBoldClass(titleEl.classList);
-    const isActive = !!titleEl.querySelector('span'); // Has the green dot ?
+    const {name, unreadCount} = parseThreadTitle(rawName)
+    ZeroWorker.textify($content)
+    const snippet = $content.innerText
+    const footer = $footer.innerText
+    const isUnread = hasBoldClass($title.classList)
+    const hasGreenDot = !!$title.querySelector('span') // Thread has the green dot?
     
-    return { link, name, snippet, footer, isActive, isUnread, unreadCount}
+    return { link, name, index, snippet, footer, hasGreenDot, isUnread, unreadCount }
   }
   
   /**
@@ -76,19 +77,11 @@ ZeroWorker.getThreads = function getThreads() {
   }
 
   function getLinkToOlder() {
-    try {
-      return document.querySelector('#see_older_threads a').href
-    } catch (e) {
-      return ''
-    }
+    return ZeroWorker.getHref(document.querySelector('#see_older_threads a'))
   }
 
   function getLinkToNewer() {
-    try {
-      return document.querySelector('#see_newer_threads a').href    
-    } catch (e) {
-      return ''
-    }
+    return ZeroWorker.getHref(document.querySelector('#see_newer_threads a'))
   }
   
   return {

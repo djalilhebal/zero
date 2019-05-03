@@ -20,7 +20,7 @@ With a few edits, it should work fine with any headless browser (something like 
 
 ## Screenshot
 Instead of something like this:
-![A screenshot of two tabs showing Facebook Zero](docs/screenshots/screenshot_Messenger.png)
+![A screenshot of two tabs showing Facebook Zero](docs/screenshots/0FB-threads-and-chat.png)
 
 How about this:
 ![A screenshot of the app](docs/screenshots/screenshot_2018-10-10_pixelated.png)
@@ -37,7 +37,7 @@ Google Chrome doesn't allow extensions off its store. You'll have to do this:
 Each time you reopen Google Chrome, it will ask you to disable the extension, just reject that message.
 
 ## How Does It Works?
-[Check this drafty post](docs/blog-post.md)
+[Check this drafty post](docs/blog-post.md).
 
 Basically, it consists of three `Promise`-based parts: Messenger, Master and Worker (and "Broker"):
 
@@ -57,6 +57,13 @@ and updates its datastore when the user does something or **Master** receives ne
 - The language used by the active user is English (important for parsing information)
 - User doesn't send the same messages more than once (important for error recovery -- "auto-resend")
 - Not important: "0" won't be sent or received.
+
+
+## Coding style
+I generally try to follow [AirBnB's JavaScript Style Guide](https://github.com/airbnb/javascript). **On ZeroWorker, semicolons are omitted. Fix that?**
+
+- Variables that reference regexes start with `r`, as in `const rNumber = /[0-9]/`.
+- Variables that reference HTML elements start with `$`, as in `const $form = document.querySelector('from')`.
 
 ## TODO
 Check `docs/ideas.js` and `.txt`.

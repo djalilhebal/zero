@@ -1,6 +1,7 @@
-/** @file ZeroWorker.profile: Parse users and pages' information */
-
-/** @returns {object} Profile's info */
+/**
+ * Parse users and pages' information.
+ * @returns {ZeroProfile | ZeroError}
+ */
 ZeroWorker.getProfileInfo = function getProfileInfo() {
 
   /**
@@ -106,7 +107,6 @@ ZeroWorker.getProfileInfo = function getProfileInfo() {
     }
     
   } catch(e) {
-    console.error(e)
     return {error: e}
   }
 }

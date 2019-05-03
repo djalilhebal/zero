@@ -1,7 +1,7 @@
 Important
 =========
 - MediaMessage and TextMessage no longer exist: Everything is Message and ZeroFile, update refs!
-- Make use of ZeroWorker.d.ts
+- "use strict"
 - Keep usernames in the form /user and not @user.
 - ZeroWorker.getProfileInfo() should just return `myActivityLink` and not extract `myId` from it. Let ZeroMessenger do that. 
 - Use chatchunks' first/last timestamps to set messages' dates `createdDate`
@@ -13,15 +13,11 @@ Important
 ZeroBroker
 ==========
 - Add ZeroBroker.request(fbid) and Messenger.sendFile(file)
-- ZeroFile ids should start with a prefix like `zmid<NUMBER>`
-- Files should not be auto-requested. Only request them if the user clicks on them.
-- Verify the existence of ZeroBroker
-- No ZeroBroker but want to send ZeroMedia? "Do this if the recipient uses ZeroMessenger."
 - ZeroBroker deletes *parts* once it receives them.
 - ZeroMessenger deletes *parts* once it reads them.
-
-zeroFile = ZeroBroker.makeZeroFile(file)
-zeroFile.parts, for each await sendText(toMySelf, autoretry)
+- Verify the existence of ZeroBroker
+- Files should not be auto-requested. Only request them if the user clicks on them.
+- No ZeroBroker but want to send ZeroMedia? "Do this if the recipient uses ZeroMessenger."
 
 ZeroMessenger
 =============
@@ -45,3 +41,4 @@ TODO (Later)
 - **Security**: Have I exposed myself to XSS attacks? (In the 'specialText' thing + converting it to HTML)
 - Handle empty messages (that actually contain "0")?
 - ZeroProfile: photoId or photoLink, so we can `ZeroBroker.request(photoId)`
+- Rename `Moi` -> `ActiveUser`?

@@ -5,10 +5,9 @@
 
 const ZeroWorker = {}
 
-/** @private */
 ZeroWorker._pageDate = Date.now(); // important for updating
 ZeroWorker._pageLink = window.location.toString(); // caching
-ZeroWorker.addMeta = function addMeta(obj) {
+ZeroWorker._addMeta = function _addMeta(obj) {
   obj._pageDate = ZeroWorker._pageDate
   obj._pageLink = ZeroWorker._pageLink
 }
@@ -28,6 +27,20 @@ ZeroWorker.getLink = function getLink(criteria) {
     return link
   } catch (e) {
     console.warn(e)
+    return ''
+  }
+}
+
+/**
+ * Extract href string from the anchor `$a` maybe
+ * Used often in different places
+ * @param {HTMLAnchorElement} $a - Anchor element maybe
+ * @return {string} Link or empty string
+ */
+ZeroWorker.getHref = function getHref($a) {
+  if ($a && typeof $a.href === 'string') {
+    return $a.href
+  } else {
     return ''
   }
 }
@@ -85,7 +98,7 @@ ZeroWorker.getError = function getError() {
   const $root = document.querySelector('#root')
   let err = '';
   if ($root.children.length === 3) {
-    $firstDiv = $root.children[0]
+    const $firstDiv = $root.children[0]
     if (getComputedStyle($firstDiv).borderColor === errBorderColor) {
       err = $firstDiv.innerText
     }
@@ -96,10 +109,7 @@ ZeroWorker.getError = function getError() {
 /**
  * Obeys Master's order and sends a response.
  *
- * @param {Event} event
- * @param {object} event.data
- * @param {string} event.data.fn
- * @param {Array} event.data.args
+ * @param {MessageEvent} event
  * @listens Window:message
  * @fires Window:message
  */
@@ -117,7 +127,7 @@ ZeroWorker.onOrder = function onOrder(event) {
   if (output) {
     const isObject = typeof output === 'object' && !Array.isArray(output)
     const response =  isObject ? output : {value: output}
-    ZeroWorker.addMeta(response)
+    ZeroWorker._addMeta(response)
     event.source.postMessage({job, response}, '*')    
   }
 

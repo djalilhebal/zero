@@ -1,17 +1,11 @@
-/** @file ZeroWorker.conversation */
-
-/** @return {Object} */
-ZeroWorker.getComposerInfo = function getComposerInfo() {
-  const recipientsDiv = document.querySelector('#messaging_compose_error').nextSibling;
-  const nameAppears = !!recipientsDiv.querySelector('a[class]');
-  return {nameAppears}
-}
-
-/** @returns {Object} */
+/**
+ * Parse chat info and content (messages)
+ * @return {ChatChunk | ZeroError}
+ */
 ZeroWorker.getChunk = function getChunk() {
 
   /** @returns {boolean} */
-  function getIsNewConversation() {
+  function getHasSelector() {
    return !!ZeroWorker.getLink('https://0.facebook.com/friends/selector')
   }
 
@@ -22,15 +16,15 @@ ZeroWorker.getChunk = function getChunk() {
 
   /** @returns {string} */
   function getOlderLink() {
-    return (document.querySelector('#see_older a') || {}).href || ''
+    return ZeroWorker.getHref(document.querySelector('#see_older a'))
   }
 
   /** @returns {string} */
   function getNewerLink() {
-    return (document.querySelector('#see_newer a') || {}).href || ''
+    return ZeroWorker.getHref(document.querySelector('#see_newer a'))
   }
 
-  /** @returns {Array<Object>} */
+  /** @returns {Array<ZeroMessage>} */
   function getMessages() {
     /*
     <div id="messageGroup">
@@ -40,7 +34,7 @@ ZeroWorker.getChunk = function getChunk() {
     </div>
     */
     
-    if (getIsNewConversation())
+    if (getHasSelector())
       return []
     
     const $groupDiv = document.querySelector('#messageGroup')
@@ -48,7 +42,7 @@ ZeroWorker.getChunk = function getChunk() {
     const $messagesDiv = Array.from($groupDiv.children).find($x => !$x.id)
     const messages = Array.from($messagesDiv.children)
                       .map(parseMessageDiv)
-                      .filter( obj => typeof obj === 'object')
+                      .filter(obj => typeof obj === 'undefined')
     return messages;
   }
 
@@ -67,6 +61,7 @@ ZeroWorker.getChunk = function getChunk() {
     }
   }
 
+  /** @returns {ZeroMessage} */
   function parseMessageDiv($messageDiv) {
     try {
       let $sender = $messageDiv.children[0].querySelector('a')
@@ -85,7 +80,7 @@ ZeroWorker.getChunk = function getChunk() {
       return {text, senderName, senderLink, deleteLink, footer}
     } catch(e) {
       console.error(e)
-      return {}
+      return undefined
     }
   }
 
@@ -93,24 +88,23 @@ ZeroWorker.getChunk = function getChunk() {
   function parseHeader() {
     try {
       const $headerDiv = document.querySelector('#root > div > div > div')
-      const $toParticipants = $headerDiv.querySelector('a');
-      const groupInfoLink = $toParticipants ? $toParticipants.href : '';
-      const name = $headerDiv.children[0].innerText;
-      const hasGreenDot = $headerDiv.children.length === 3;
+      const $toParticipants = $headerDiv.querySelector('a')
+      const groupInfoLink = $toParticipants ? $toParticipants.href : ''
+      const name = $headerDiv.children[0].innerText
+      const hasGreenDot = $headerDiv.children.length === 3
       // e.g. 'active now' or 'active 5 minutes ago'
       // exists only if it's not a group conversation
-      const statusText = groupInfoLink ? '' : $headerDiv.children[1].innerText;
+      const statusText = groupInfoLink ? '' : $headerDiv.children[1].innerText
       return {name, hasGreenDot, statusText, groupInfoLink}
     } catch(e) {
-      console.error(e)
-      return {}
+      return {error: e}
     }
   }
 
   const result = {
     ...parseHeader(),
     messages: getMessages(),
-    isNewConversation: getIsNewConversation(),
+    hasSelector: getHasSelector(),
     hasComposer: getHasComposer(),
     olderLink: getOlderLink(),
     newerLink: getNewerLink(),
@@ -119,7 +113,7 @@ ZeroWorker.getChunk = function getChunk() {
 }
 
 /**
- * @param {string} str - text message to send
+ * @param {string} str - Text message to send
  * @throws {Error}
  */
 ZeroWorker.sendText = function sendText(str) {
@@ -132,6 +126,17 @@ ZeroWorker.sendText = function sendText(str) {
   if (typeof str !== 'string' || str.length === 0)
     throw new Error('Input should be a string && length > 0')
 
-  $input.value = str;
-  $form.submit();
+  $input.value = str
+  $form.submit()
+}
+
+/**
+ * Get message composer's info.
+ * - If the recipient's `nameAppears` in the composer, it means they are "messageable."
+ * @returns {Object}
+ */
+ZeroWorker.getComposerInfo = function getComposerInfo() {
+  const recipientsDiv = document.querySelector('#messaging_compose_error').nextSibling
+  const nameAppears = !!recipientsDiv.querySelector('a[class]')
+  return {nameAppears}
 }
