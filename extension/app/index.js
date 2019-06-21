@@ -2,28 +2,17 @@ let moi = null;
 
 const app = new Vue({
   el: '#app',
-  data: {
-    moi: null,
-    profiles: {},
-    conversations: {
-      active: null,
-    },
-    refreshers: {
-      contacts: {
-        EVERY: 30*1000, // 30 secs
-        onprogress: false,
-      },
-      threads: {
-        EVERY: 10*1000, // 10 secs
-        onprogress: false,
-      },
-      conversation: {
-        EVERY: 5*1000, // 5 secs
-        onprogress: '',
-      }
-    }
-  }, // data
+  data: new Messenger(),
 
+  ready() {
+    // set refreshers
+    const {threads, contacts, conversation, now} = this.refreshers;
+    threads.interval = setInterval(this.updateThreads, threads.EVERY);
+    contacts.interval = setInterval(this.updateContacts, contacts.EVERY);
+    conversation.interval = setInterval(this.updateActiveConversation, conversation.EVERY);
+    now.interval = setInterval(() =>  this.now = Date.now(), now.EVERY);
+  },
+  
   computed: {
     threads() {
       return Object
@@ -103,12 +92,3 @@ const app = new Vue({
 
   } // methods
 })
-
-// Let's get rolling!
-(async function main() {
-  // set refreshers
-  const {threads, contacts, conversation} = app.refreshers
-  threads.interval = setInterval(app.updateThreads, threads.EVERY)
-  contacts.interval = setInterval(app.updateContacts, contacts.EVERY)
-  conversation.interval = setInterval(app.updateActiveConversation, conversation.EVERY)
-})();

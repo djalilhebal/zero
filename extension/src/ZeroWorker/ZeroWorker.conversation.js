@@ -1,6 +1,6 @@
 /**
  * Parse chat info and content (messages)
- * @return {ChatChunk | ZeroError}
+ * @return {ZeroChat | ZeroError}
  */
 ZeroWorker.getChunk = function getChunk() {
 
@@ -114,20 +114,20 @@ ZeroWorker.getChunk = function getChunk() {
 
 /**
  * @param {string} str - Text message to send
- * @throws {Error}
+ * @throws {TypeError}
  */
 ZeroWorker.sendText = function sendText(str) {
-  const $form = document.querySelector('#composer_form')
-  const $input = $form.querySelector('textarea')
+  const $form = document.querySelector('#composer_form');
+  const $input = $form && $form.querySelector('textarea');
 
   if (!$form || !$input)
-    throw new Error('$form or $input not found')
+    throw new TypeError('$form or $input not found');
 
   if (typeof str !== 'string' || str.length === 0)
-    throw new Error('Input should be a string && length > 0')
+    throw new TypeError('Input should be a string && length > 0');
 
-  $input.value = str
-  $form.submit()
+  $input.value = str;
+  $form.submit();
 }
 
 /**
@@ -136,7 +136,9 @@ ZeroWorker.sendText = function sendText(str) {
  * @returns {Object}
  */
 ZeroWorker.getComposerInfo = function getComposerInfo() {
-  const recipientsDiv = document.querySelector('#messaging_compose_error').nextSibling
-  const nameAppears = !!recipientsDiv.querySelector('a[class]')
+  const $composeError = document.querySelector('#messaging_compose_error');
+  const $recipientsDiv = $composeError && $composeError.nextSibling;
+  const nameAppears = $recipientsDiv && !!$recipientsDiv.querySelector('a[class]');
+
   return {nameAppears}
 }

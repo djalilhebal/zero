@@ -2,28 +2,29 @@ class Profile {
   /**
    * Create new profile.
    *
-   * @param {Object} obj
-   * @param {string} obj.id
-   * @param {string} obj.name
-   * @param {string} obj.username
+   * @param {ZeroProfile} obj
    */
   constructor(obj) {
-    this.id = obj.id
-    this.name = obj.name
-    this.username = this.formatUsername(obj.username)
+    this.id = obj.id;
+    this.name = obj.name;
+    this.username = Profile.formatUsername(obj.username);
   }
 
-  /** @returns {string} */
-  formatUsername(str) {
-    // TODO: toLowerCase it?
-    if (!str)
-      return ''
-    else if (str.startsWith('@'))
-      return str
-    else if (str.startsWith('/'))
-      return str.replace('/', '@')
-    else
-      return '@' + str
+  /**
+   * @todo toLowerCase it
+   * @param {string?} str - Raw username
+   * @returns {string}
+   */
+  static formatUsername(str) {
+    if (!str) {
+      return '';
+    } else if (str.startsWith('@')) {
+      return str;
+    } else if (str.startsWith('/')) {
+      return str.replace('/', '@');
+    } else {
+      return '@' + str;
+    }
   }
 
   /** @param {Object} obj */

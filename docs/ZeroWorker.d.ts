@@ -18,7 +18,7 @@ interface ZeroMessage extends ZeroResponse {
   footer: string
 }
 
-interface ChatChunk extends ZeroResponse {
+interface ZeroChat extends ZeroResponse {
   name: string
   messages: Array<ZeroMessage>
   statusText: string

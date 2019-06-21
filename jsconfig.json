@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-      "checkJs": false,
-      "target": "es6"
+      "checkJs": true,
+      "strict": true,
+      "target": "es6",
   },
   "exclude": [
       "docs/idea.js",

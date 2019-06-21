@@ -1,4 +1,7 @@
 class Conversation {
+  /**
+   * @param {ZeroChat} obj 
+   */
   constructor (obj) {
     if (!obj) {
       throw new Error('Expected obj')
@@ -7,7 +10,7 @@ class Conversation {
     this.name = obj.name
     this.id = obj.id || moi.getTheirId(obj._pageLink) // official
     this.participants = [] // official
-    this.snippet = TextMessage.formatText(obj.snippet) // official
+    this.snippet = Message.formatText(obj.snippet) // official
     this.updatedTime = null // official
     this.messageCount = null // official
     this.unreadCount = null // official
@@ -28,37 +31,38 @@ class Conversation {
   }
 
   mediafy(x) {
-    const matched = x.text.match(MediaMessage.rZeroMedia)
+    const matched = x.text.match(ZeroFile.rZeroMedia);
     if (matched) {
-      x.hidden = true
+      x.hidden = true;
       let [, id, partNum, partsCount, partData] = matched;
-      const old = this.messages.find( y => y instanceof MediaMessage && y.id === id)
+      //TODO Replace the ZeroPart with a message with attachements
+      const old = this.messages.find( y => y instanceof ZeroFile && y.id === id);
       if (old) {
-        old.addPart(partNum, partData)
+        old.addPart(partNum, partData);
       } else {
-        const media = new MediaMessage(id, partsCount, x)
-        media.addPart(partNum, partData)
-        this.messages.push(media)
+        const media = new ZeroFile({id, partsCount, mime: "image/*"});
+        media.addPart(partNum, partData);
+        this.messages.push(media);
       }
     }
   }
 
   /** @returns {Message} */
   getLatestMessage() {
-    return this.messages.filter(x => x instanceof Message).slice(-1)[0]
+    return this.messages.filter(x => x instanceof Message).slice(-1)[0];
   }
 
   async init() {
     if (this.messages.length)
       return;
     const {messages} = await Conversation.getChunk(this.id)
-    this.messages = (messages || []).map( m => new TextMessage(m))
+    this.messages = (messages || []).map(m => new Message(m))
     this.messages.forEach( message => this.mediafy(message))
     const latestMessage = this.getLatestMessage()
     this._latestMid = latestMessage && latestMessage.getLatestMid()
   }
 
-  /** @returns {boolean} */
+  /** @returns {Promise<boolean>} */
   async isUpToDate() {
     if (!this._latestMid) {
       return false
@@ -78,9 +82,13 @@ class Conversation {
     }
   }
 
+  /**
+   * @param {ZeroThread} obj 
+   * @returns {void}
+   */
   updateFromThread(obj) {
     if (typeof obj === 'object') {
-      this.snippet = TextMessage.formatText(obj.snippet)
+      this.snippet = Message.formatText(obj.snippet)
       this.footer = obj.footer
       this.index = obj.index
       this._isUnread = obj.isUnread
@@ -198,7 +206,7 @@ class Conversation {
       return `${Messenger.origin}/messages?folder=${folder}`
   }
 
-  /** @returns {Object} */
+  /** @returns {Promise<Object>} */
   static async getThreads() {
     const job = {fn: 'getThreads', url: Conversation.getThreadsLink()}
     const res = await (new Master(job)).getResponse()

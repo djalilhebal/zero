@@ -26,12 +26,12 @@ class Master {
    * For re-using workers.
    *
    * @param {object} job - The Worker's `raison d'être`
-   * @param {!string} job.url - The original URL to start with
-   * @param {!string} job.fn - The function name that ZeroWorker will call
-   * @param {Array<*>} [job.args=[]] - The function's parameters
-   * @param {boolean} [job.reloads=false] - Does the `job` make the page reload?
-   * @param {boolean} [job.once=true] - Should the Worker be killed after one call?
-   * @param {?Object} job.times - Max load/reload/response waiting times
+   * @param {string?} job.url - The original URL to start with
+   * @param {string?} job.fn - The function name that ZeroWorker will call
+   * @param {Array<any>?} [job.args=[]] - The function's parameters
+   * @param {boolean?} [job.reloads=false] - Does the `job` make the page reload?
+   * @param {boolean?} [job.once=true] - Should the Worker be killed after one call?
+   * @param {Object<string, number>?} job.times - Max load/reload/response waiting times
    * @public
    */
   setJob(job) {
@@ -50,7 +50,7 @@ class Master {
     const times = {load, reload, response}
 
     // important for handling message events
-    job.id = Master.jobNumber++ // good enough?
+    job.id = Master.jobNumber++ //FIXME: is this good enough?
 
     Object.assign(job, {args, reloads, once, times} )
     this.job = job

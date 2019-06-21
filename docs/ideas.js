@@ -8,16 +8,6 @@ function generateHtml(rawText) {
   return html  
 }
 
-async function isSent() {
-  w.setJob( {'fn': 'getError'})
-  const res = await w.getResponse()
-  return res && res._pageLink.searchParams.get('request_type') === 'send_success'
-}
-
-function resend() {
-  // getLatestChunk().lastMessage.content === this.content && isMine? Already sent!
-}
-
 /**
  * on User and Message
  * @todo use `timeago.js`
@@ -43,12 +33,3 @@ function getActiveDateStr() {
   }
 }, false);
 */
-
-// Add to the VueJS instance, to automatically update Messenger's 'time ago' texts
-function ready() {
-  var self = this;
-  setInterval(function () {
-     console.log('updating ticker')
-     self.$data.now = Date.now()
-  }, 1000)
-}

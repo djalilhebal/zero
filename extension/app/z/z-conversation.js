@@ -1,6 +1,7 @@
 Vue.component('z-conversation', {
   props: ['conv'],
 
+  // TODO: use <form> and <submit> and @submit.prevent.stop
   template: `
   <div class="conversation">
     <div class="messages">
@@ -16,14 +17,15 @@ Vue.component('z-conversation', {
   </div>`,
 
   mounted() {
-    if (this.conv instanceof Conversation)
-      this.conv.init()
+    if (this.conv instanceof Conversation) {
+      this.conv.init();
+    }
   },
 
   methods: {
     send() { // in composer
-      const text = this.$el.querySelector('input[type="text"]').value
-      this.conv.sendText(text)
+      const text = this.$el.querySelector('input[type="text"]').value;
+      this.conv.sendText(text);
     }
   }
 })

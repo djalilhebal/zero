@@ -1,29 +1,22 @@
-Important
-=========
-- MediaMessage and TextMessage no longer exist: Everything is Message and ZeroFile, update refs!
-- "use strict"
-- Keep usernames in the form /user and not @user.
-- ZeroWorker.getProfileInfo() should just return `myActivityLink` and not extract `myId` from it. Let ZeroMessenger do that. 
-- Use chatchunks' first/last timestamps to set messages' dates `createdDate`
-- Handle events ("Kaito left the group")
-
-- When sending messages, use **message composer** (as opposite to using a "normal" chat page); this way, old messages (which may be very long) won't be loaded.
-- Set the Moi's active status to 'unknown', before actually getting their correct status.
+- Mock 0FB to continue dev after the cancellation of the service?
 
 ZeroBroker
 ==========
 - Add ZeroBroker.request(fbid) and Messenger.sendFile(file)
 - ZeroBroker deletes *parts* once it receives them.
 - ZeroMessenger deletes *parts* once it reads them.
-- Verify the existence of ZeroBroker
+- ZeroProfile return {photoId} or {photoLink} so we can `ZeroBroker.request(photoId)`
 - Files should not be auto-requested. Only request them if the user clicks on them.
-- No ZeroBroker but want to send ZeroMedia? "Do this if the recipient uses ZeroMessenger."
+- Instead of using my DSL maybe use JSON-RPC?
 
 ZeroMessenger
 =============
-- Cache files? Something like: `Messenger.files = {}`
-
+- ZeroWorker.getProfileInfo() should just return `myActivityLink` and not extract `myId` from it. Let ZeroMessenger do that. 
+- Keep usernames in the form /user and not @user.
+- Handle events ("Kaito left the group")
 - Separate background and app
+- Verify the existence of ZeroBroker
+- Add option: No ZeroBroker but want to send ZeroMedia? "Do this if the recipient uses ZeroMessenger."
 - message.isMine()? Hide senderName from the message bubble!
 - Chat.canReply = Chat.isGroup ? hasComposer : (senderLink || nameAppearsInComposer)
 - Message.status: fetched, sent, sending, failed
@@ -36,9 +29,8 @@ thread.index = pageNum * 10 + index in page
 
 TODO (Later)
 ============
+- Rename `Moi` -> `ActiveUser`?
 - Write ZeroCommon.js: stuff used by Messenger, Worker, and Broker.
 - Serialize `composer` form and use axios to send messages. Use the FormData class instead of working with 'HTML <form> elements'.
 - **Security**: Have I exposed myself to XSS attacks? (In the 'specialText' thing + converting it to HTML)
-- Handle empty messages (that actually contain "0")?
-- ZeroProfile: photoId or photoLink, so we can `ZeroBroker.request(photoId)`
-- Rename `Moi` -> `ActiveUser`?
+- Handle empty messages (that actually contain "0")? Maybe just assume "0" won't be sent or received.

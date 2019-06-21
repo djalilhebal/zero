@@ -1,7 +1,8 @@
 # ZeroMessenger
 An app that improves Facebook Zero's messaging functionality. (0.facebook.com/messages) \[WIP\]
 
-I believe I've overcome the main difficulties (mostly technicalities). Still, it is messy and incomplete... I may finish this thing some time in the unforeseeable future.
+I believe I've overcome the main difficulties (mostly technicalities). Still, it is messy and incomplete...
+I may finish this thing some time in the unforeseeable future.
 
 With a few edits, it should work fine with any headless browser (something like *Puppeteer* or *PhantomJS*) in order to use it in different environments (desktop, mobile, or whatever).
 
@@ -16,7 +17,6 @@ With a few edits, it should work fine with any headless browser (something like 
 - [ ] **Messages requests** are not indicated, you need to manually click on `View Message Requests` to check whether any exists.
 - [ ] **RTL**: doesn't handle right-to-left scripts (like Arabic) and "mixed directions".
 - Other stuff: 'stickers' suffer like 'emoji' but that's fine, nobody really uses them anymore.
-- ~~**Emoticons** cannot be sent from desktop.~~ Chrome now supports them.
 
 ## Screenshot
 Instead of something like this:
@@ -39,16 +39,16 @@ Each time you reopen Google Chrome, it will ask you to disable the extension, ju
 ## How Does It Works?
 [Check this drafty post](docs/blog-post.md).
 
-Basically, it consists of three `Promise`-based parts: Messenger, Master and Worker (and "Broker"):
+Basically, it consists of four `Promise`-based parts: Messenger, Master, Worker, and "Broker":
 
-- **Messenger** (`/app`): A typical instant messaging interface. It interacts directly with the user,
+- **Messenger** (`/extension/app`): A typical instant messaging interface. It interacts directly with the user,
 and updates its datastore when the user does something or **Master** receives new data.
 
-- **Master** (`/src`'s classes): Creates new `Worker`s (hidden `iframe`) and sends them orders... and finally kills them when they lose their *raison d'être*.
+- **Master** (`/extension/src`'s classes): Creates new `Worker`s (hidden `iframe`s) and sends them orders... and finally kills them when they lose their *raison d'être*.
 
-- **Worker** (`/src/ZeroWorker`): Once loaded it listens for Master's orders and obeys them (and may send Master a response).
+- **Worker** (`/extension/src/ZeroWorker`): Once loaded it listens for Master's orders and obeys them (and may send Master a response).
 
-- **Broker** (`/src/ZeroBroker` *WIP*): My original idea. A bot that turns binary into text (base64), sends them to *Moi*, where they get turned back into binary: images and stuff... Currently, Zerofy is used to do it "manually".
+- **Broker** (`/extension/src/ZeroBroker`): My original idea. A bot that turns binary into text (base64), sends them to *Moi*, where they get turned back into binary: images and stuff... Currently, Zerofy is used to do it "manually".
 
 ### Assumptions
 - User doesn't change the active account (important for not mixing conversations and stuff)
@@ -56,17 +56,24 @@ and updates its datastore when the user does something or **Master** receives ne
 - Usernames won't change while using the App (important for caching)
 - The language used by the active user is English (important for parsing information)
 - User doesn't send the same messages more than once (important for error recovery -- "auto-resend")
-- Not important: "0" won't be sent or received.
-
 
 ## Coding style
-I generally try to follow [AirBnB's JavaScript Style Guide](https://github.com/airbnb/javascript). **On ZeroWorker, semicolons are omitted. Fix that?**
+I generally try to follow [AirBnB's JavaScript Style Guide](https://github.com/airbnb/javascript).
 
-- Variables that reference regexes start with `r`, as in `const rNumber = /[0-9]/`.
+- Variables that reference regexes start with `r`, as in `const rDigit = /^[0-9]$/`.
 - Variables that reference HTML elements start with `$`, as in `const $form = document.querySelector('from')`.
+- In Vue components, `z-` is my `ZeroMessenger`'s namespace. (This app requires no build step. Change that?)
+- **On ZeroWorker, semicolons are omitted. Fix that?**
 
 ## TODO
-Check `docs/ideas.js` and `.txt`.
+Check `docs/ideas.txt` and `.js`.
+
+- [ ] UML: Update the class diagram to reflect changes in code!
+- [ ] CSS: Use grid or flex instead of floats, stupid!!
+- [ ] Initially set `Moi`'s status to 'unknown' (and not "active"), before actually getting the true status.
+- [ ] When sending messages, use **message composer** (as opposite to using a "normal" chat page).
+  this way, old messages (which may be very long) won't be loaded.
+- [ ] Use ZeroChats' first/last timestamps to set messages' dates `createdDate`.
 
 ## License
 CC0
