@@ -1,4 +1,19 @@
+- Zero: Add dependencies: vuejs
+- Zero: Worker.obey returns object
+- Zero: Move Broker to root
+
 - Mock 0FB to continue dev after the cancellation of the service?
+Zero:
+- JS: Minitasks, looping queues(?) promise interval?
+- Zero/Vue maybe uses @egoist/poi
+- VueJS, learn/use: this.$nextTick
+- Maybe use: Singleton and/or Module pattern
+- Maybe pass $doc to constructor
+
+- Interesting protocols to rip off: MQTT http://mqtt.org/
+- find a restful api for a typical chat app
+- find IM app's different uml diagrams (not only classes)
+- use `he` to decode html
 
 ZeroBroker
 ==========
@@ -8,6 +23,12 @@ ZeroBroker
 - ZeroProfile return {photoId} or {photoLink} so we can `ZeroBroker.request(photoId)`
 - Files should not be auto-requested. Only request them if the user clicks on them.
 - Instead of using my DSL maybe use JSON-RPC?
+
+- Use Low Quality Image Placeholders, something like https://github.com/zouhir/lqip
+hasManyParts() this.parts.length >= 3
+if hasManyParts() create LQIP's thumbnail, else send colors' palate
+Send part=0, data=base64(thumbnail) whose size is <= 10K characters.
+10K characters in base64 = ? in binary
 
 ZeroMessenger
 =============

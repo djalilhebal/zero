@@ -1,8 +1,8 @@
 {
    "name": "ZeroMessenger",
    "version": "0.0.2",
-   "description": "Improves Facebook Zero's instant messaging functionality",
-   "author": "dreamski21",
+   "description": "Improve Facebook Zero's instant messaging functionality",
+   "author": "djalilhebal",
    "background": { "scripts": ["background.js"] },
    "browser_action": { "default_title": "ZeroMessenger" },
    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",

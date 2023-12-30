@@ -2,7 +2,7 @@
 
 *Djezzy* is an Algerian mobile network operator. Djezzy provides a zero-rated, text-only version of Facebook: Facebook Zero (0.facebook.com) or 0FB for short.
 
-Some students (like myself) are practically poor and cannot afford a real internet access so they end up relying on this service. What I'm presenting here is my attempt at making Facebook Zero a better shit.
+Some students (like myself) are practically poor and cannot afford real internet access so they end up relying on this service. What I'm presenting here is my attempt at making Facebook Zero a better shit.
 
 > *Turning something like this:*
 ![Facebook Zero screenshot](screenshots/0FB-threads-and-chat.png)
@@ -20,8 +20,8 @@ After "studying" (i.e. using) Facebook Zero for over a year, I realized that the
 The idea is simple: *If I can manipulate only texts then that's what I'm gonna do*:
 
 We treat Facebook Zero as if it were merely a messy database and an intermediate to exchange data.  
-So, to send a photo (or any file for that matter), first convert it to text (*base64*) and send it as a text message.  
-On the other side, the recipient should convert it back to binary and view it.
+So, to send a photo (or any file for that matter), first, convert it to text (*base64*) and send it as a text message.  
+On the other end of the wire, the recipient should convert it back to binary and view it.
 
 ## Gathering data
 
@@ -42,7 +42,7 @@ const name = document.querySelector('#objects_container strong').innerText // 'D
 const rawGender = document.querySelector(`#root [title="Gender"]`).innerText.trim() // 'Gender\nMale'
 const gender = gender.split('\n')[1].toLowerCase() // 'male'
 
-// The above two lines can be used to get other (*useful*) information, like the `username`
+// The above two lines can be used to get other (*useful*) pieces of information, like the `username`
 // so let's turn it into a more general and less error-prone function:
 function getAttr(attr, lowerCase = true) {
   const $container = document.querySelector(`#root [title="${attr}"]`)
@@ -64,7 +64,7 @@ const phoneNumber = getAttr('Mobile') // ''
 - **id**  
 <img alt="0FB profile" src="screenshots/0FB-profile.png" width="250px" align="left" style="margin: 10px; margin-left: 0;" />  
 As far as I know, Facebook assigns an id (*FBID*) to each of its objects (profiles, groups, posts, messages, etc.).  
-In every 'messageable' profile ("page" or "user") webpage, there exists a 'Message' button (a link, actually). We can use this link to get the profile's id.  
+In every 'message-able' profile ("page" or "user") webpage, there exists a 'Message' button (a link, actually). We can use this link to get the profile's id.  
 We can either look for a link whose text content consists of "Message", or whose URL starts with a specific prefix. I chose the latter approach:
 
 ```js
@@ -79,7 +79,7 @@ const [, id] = messageLink.match(/thread\/(\d+)/)
 <img alt="My profile in Italian" src="screenshots/0FB-profile-moi.png" width="250px" align="left" style="margin: 10px; margin-left: 0;" />
 We assume I'm already logged in. To get my id, we go to my profile page (`/profile.php`) and extract it from the "Registo de atividade" ("Activity Log") link.  
 We basically repeat the same work we did earlier with `id` but this time the link has this pattern: `https://0.facebook.com/<MY_ID>/allactivity`.  
-**Note: Many pieces of code in my app are currently language specific (only English works for now).**
+**Note: Many pieces of code in my app are currently language-specific (only English works for now).**
 
 - **hasGreenDot** was a little tricky at first as I couldn't just use a simple CSS selector that identifies it:
 Apparently some parts of Facebook Zero pages get automatically minified/uglified
@@ -150,12 +150,12 @@ We can see a chat page's markup like this (at least this is what I recall):
 
 - In each conversation, we can use the `see_older` and `see_newer` links to obtain timestamps of the last and first messages (respectively) in the target section.
 
-- Messages can be grouped together in what I call "message blocks". That happens when a user sends multiple messages consecutively.
+- Messages can be grouped together in what I call "message blocks"; they are created when a user sends multiple messages consecutively.
 
 - Each *message block* contains 'message ids' (*mids*).  
-Clicking on the **Delete Selected** link (on the bottom), shows a "Delete" button next to each message. This button is actually a link that contains the message's mids.
+Clicking on the **Delete Selected** link (on the bottom) shows a "Delete" button next to each message. This button is actually a link that contains the message's mids.
 
-These attributes can be used to automatically update the conversation by fetching new messages and deduplicating repeated ones (for technical reasons, duplicates can appear).
+These attributes can be used to automatically update the conversation by fetching new messages and deduplicating repeated ones (for technical reasons, duplicates can appear when "scrolling" up and down).
 
 As with profiles, using the mentioned specifications, we write a function that collects the needed data and returns it:
 
@@ -185,7 +185,7 @@ ZeroWorker.sendText = function sendText(str) {
 
 ## Parts
 
-Basically, it consists of three `Promise`-based parts: Messenger, Master and Worker (in addition to "Broker").
+Basically, it consists of three `Promise`-based parts: Messenger, Master, and Worker (in addition to "Broker").
 
 > ![ZeroMessenger's complete UML class diagram](./zero-uml.jpeg)
 `ZeroMessenger.uml` exported as image using *WhiteStarUML*.
@@ -196,7 +196,7 @@ A ZeroWorker (presented in the **Gathering Data** section) runs on iframes that 
 
 A Worker listens for orders, executes them, and finally sends a response to Master. *ZeroWorkers* and *Masters* communicate via [cross-document messaging](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage).
 
-The following code shows how jobs are handeled.
+The following code shows how jobs are handled.
 **This is the reason we have been attaching everything to the ZeroWorker namespace: To dynamically access needed functions.**
 ```js
 window.addEventListener('message', ZeroWorker.onOrder, false)
@@ -304,11 +304,11 @@ As for dynamically updating the content, ZeroMessenger periodically checks Faceb
 
 By this point, I have created a good enough API for working with Facebook Zero; the rest is just a basic chat/instant-messaging app.
 
-Once upon a time when *nwjs* was called *node-webkit* and when `Object.observe` was not deprecated, I wrote an **APK Manager** with a reactive view by observing 'data objects' and updating the DOM when changes occur. It was a fun and interesting project to work on... However, this time I decided to stop reinventing the wheel and use VueJS to handle reactivity, so I can focus on the app's logic.
+Once upon a time when *nwjs* used to be called *node-webkit* and when `Object.observe` was not deprecated, I wrote an **APK Manager** with a reactive view by observing 'data objects' and updating the DOM when changes occur. It was a fun and interesting project to work on... However, this time I decided to stop reinventing the wheel and use VueJS to handle reactivity, so I can focus on the app's logic.
 
 ### ZeroBroker
 
-This is actually [my original idea](https://github.com/dreamski21/shit/blob/master/2018-03/ZeroFB++.js): A "proxy bot" to send and receive binary data using only texts.
+This is actually [my original idea](https://github.com/djalilhebal/shit/blob/master/2018-03/ZeroFB++.js): A "proxy bot" to send and receive binary data using only texts.
 
 **It's inspired by the TCP protocol** and it works like this:
 
@@ -318,7 +318,7 @@ The bot logs in using my account and starts watching for incoming messages (incl
   - Download it
   - Convert it to text and then split it into messages
   - Add metadata to those messages
-  - And finally send those messages to my inbox.
+  - And finally, send those messages to my inbox.
 
 * **Sending**: If I want to send a file to someone:
   - I simply select something and send it, as in any messaging app.
@@ -340,20 +340,20 @@ while the other half is done automatically (**receiving**).
 ---
 
 Data is half processed by *Worker* and the rest is handled by *Messenger/Master*.
-That's confusing. Only one of them should take the responsibility and do most the work (preferably Messenger while Workers only gather raw data and "obey orders").
+That's confusing. Only one of them should take the responsibility and do most of the work (preferably Messenger while Workers only gather raw data and "obey orders").
 
 ---
 
-The way ZeroMessenger works is similar to crawlers (which Facebook tries to prevent), this necessitates that we mimic a browser. I could use libraries to grab pages (using `axios`), parse them and extract relevant info (using `cheerio`), compose requests and send them. This solution would be independent of the browser, and works on Node, the possibilities would be limitless...
+The way ZeroMessenger works is similar to crawlers (which Facebook tries to prevent), this necessitates that we mimic a browser. I could use libraries to grab pages (using `axios`), parse them and extract relevant info (using `cheerio`), compose requests and send them. This solution would be independent of the browser and work on Node, the possibilities would be limitless...
 
-That wasn't what I did. Wanting to keep it simple and having used Google Chrome's Extension API before, I decided to use iframes and inject scripts into them. This is a bad approach since it's costy (needlessly rendering pages and loading images) and gives less control (like catching network errors and redirects and stuff).
+That wasn't what I did. Wanting to keep it simple and having used Google Chrome's Extension API before, I decided to use iframes and inject scripts into them. This is a bad approach since it's costly (needlessly rendering pages and loading images) and gives less control (like catching network errors and redirects and stuff).
 
 ## Conclusions
 
-- And there you have it, 0FB is a better shit.
-You can check the source code [on GitHub](https://github.com/dreamski21/zero)... and why not fork it and finish it...
+- And there you have it, Facebook Zero is a better shit.
+You can check the source code [on GitHub](https://github.com/djalilhebal/zero)... and why not fork it and finish it...
 
-- JavaScript is amazing: It has simple and powerful APIs that can be used to make complex projects.
+- JavaScript is amazing: It has simple yet powerful APIs that can be used to make complex projects.
 
 - VueJS is beautiful: Simple syntax and, as its website promotes it, "incrementally adoptable".
 

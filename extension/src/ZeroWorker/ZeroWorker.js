@@ -1,6 +1,6 @@
 /**
  * @file A content script that is injected in https://0.facebook.com/* iframes
- * @author Djalil Dreamski <dreamski21@gmail.com>
+ * @author Abdeldjalil Hebal <abdeldjalil.hebal@gmail.com>
  */
 
 const ZeroWorker = {}

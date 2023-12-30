@@ -1,8 +1,8 @@
 {
   "name": "zero",
   "version": "0.0.2",
-  "description": "Facebook Zero thingy...",
-  "author": "Djalil Dreamski",
+  "description": "ZeroMessenger: Improve Facebook Zero's instant messaging functionality.",
+  "author": "Abdeldjalil Hebal",
   "license": "CC0",
   "private": true,
   "directories": {
