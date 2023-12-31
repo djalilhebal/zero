@@ -1,5 +1,7 @@
 # ZeroMessenger
-An app that improves Facebook Zero's messaging functionality. (0.facebook.com/messages) \[WIP\]
+https://blog.djalil.me/posts/zero
+
+An app that improves Facebook Zero's messaging functionality. (0.facebook.com/messages) \[POC\]
 
 I believe I've overcome the main difficulties (mostly technicalities). Still, it is messy and incomplete...
 I may finish this thing some time in the unforeseeable future.
